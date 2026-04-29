@@ -1,0 +1,36 @@
+---
+# Headless service: requerido por el StatefulSet para DNS estable por pod
+# (postgresql-0.postgresql-headless.postgresql.svc.cluster.local)
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-headless
+  namespace: postgresql
+  labels:
+    app: postgresql
+spec:
+  clusterIP: None
+  selector:
+    app: postgresql
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+# ClusterIP service: punto de entrada para todas las apps del cluster.
+# Conexión desde otros namespaces: postgresql.postgresql.svc.cluster.local:5432
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: postgresql
+  labels:
+    app: postgresql
+spec:
+  type: ClusterIP
+  selector:
+    app: postgresql
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
